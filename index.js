@@ -34,10 +34,10 @@ function isNotScientificName(title) {
     return wiki({ apiUrl: "https://id.wikipedia.org/w/api.php" })
       .page(title)
       .then((page) => page.fullInfo())
-      .then((info) => Object.keys(info).includes("regnum"))
-      .catch(() => false)
+      .then((info) => !Object.keys(info).includes("regnum"))
+      .catch(() => true)
   } catch (err) {
-    return false;
+    return true;
   }
 }
 
