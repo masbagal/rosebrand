@@ -1,5 +1,7 @@
 const wiki = require("wikijs").default;
+const fs = require('fs');
 const generateImage = require("./generateImage");
+const sendTweet = require('./twit');
 
 const TARGET_SYLLABLE = 6;
 const vocal = ["a", "i", "u", "e", "o"];
@@ -13,6 +15,18 @@ function isAlphabet(char) {
 
 function isVocal(char) {
   return vocal.includes(char.toLowerCase());
+}
+
+function getArticleUrl(title) {
+  try {
+    return wiki({ apiUrl: "https://id.wikipedia.org/w/api.php" })
+      .page(title)
+      .then((page) => page.url())
+      .then((url) => url)
+      .catch(() => '')
+  } catch (err) {
+    return '';
+  }
 }
 
 function isNotScientificName(title) {
@@ -99,8 +113,9 @@ async function findTitle() {
     matched = await findMatchedTitle();
     console.log(matched, attempt++);
   }
-  console.log(matched);
-  generateImage(matched);
+  await generateImage(matched);
+  const articleUrl = await getArticleUrl(matched);
+  sendTweet(matched, articleUrl);
 }
 
 findTitle();
