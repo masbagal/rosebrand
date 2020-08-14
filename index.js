@@ -102,7 +102,10 @@ function findMatchedTitle() {
     .random(10)
     .then((page) => {
       const matched = page.filter((p) => isMatchTargetSyllable(p));
-      const matchedNotLatin = matched.find(async (m) => await isNotScientificName(m));
+      const matchedNotLatin = matched.find(async (m) => {
+        const isNoLatin = await isNotScientificName(m)
+        return isNoLatin;
+      });
       return matchedNotLatin;
     })
     .catch(() => null)
