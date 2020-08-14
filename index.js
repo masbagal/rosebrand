@@ -29,12 +29,14 @@ function getArticleUrl(title) {
   }
 }
 
-function isNotScientificName(title) {
+async function isNotScientificName(title) {
   try {
     return wiki({ apiUrl: "https://id.wikipedia.org/w/api.php" })
       .page(title)
       .then((page) => page.fullInfo())
-      .then((info) => !Object.keys(info).includes("regnum"))
+      .then((info) => {
+        return !Object.keys(info).includes("regnum")
+      })
       .catch(() => true)
   } catch (err) {
     return true;
@@ -100,7 +102,7 @@ function findMatchedTitle() {
     .random(10)
     .then((page) => {
       const matched = page.filter((p) => isMatchTargetSyllable(p));
-      const matchedNotLatin = matched.find((m) => isNotScientificName(m));
+      const matchedNotLatin = matched.find(async (m) => await isNotScientificName(m));
       return matchedNotLatin;
     })
     .catch(() => null)
