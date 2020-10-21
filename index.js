@@ -1,5 +1,4 @@
 const wiki = require("wikijs").default;
-const fs = require('fs');
 const generateImage = require("./generateImage");
 const sendTweet = require('./twit');
 
@@ -35,7 +34,8 @@ async function isNotScientificName(title) {
       .page(title)
       .then((page) => page.fullInfo())
       .then((info) => {
-        return !Object.keys(info).includes("regnum")
+        const isLatin = info.hasOwnProperty('general') && info.general.hasOwnProperty('regnum');
+        return !isLatin; 
       })
       .catch(() => true)
   } catch (err) {
@@ -97,16 +97,22 @@ function isMatchTargetSyllable(word) {
   return syllableCount === TARGET_SYLLABLE;
 }
 
-function findMatchedTitle() {
+async function findMatchedTitle() {
   return wiki({ apiUrl: "https://id.wikipedia.org/w/api.php" })
     .random(10)
-    .then((page) => {
+    .then(async (page) => {
       const matched = page.filter((p) => isMatchTargetSyllable(p));
-      const matchedNotLatin = matched.find(async (m) => {
-        const isNoLatin = await isNotScientificName(m)
-        return isNoLatin;
-      });
-      return matchedNotLatin;
+
+      let matchedTitle;
+      for (const title of matched) {
+        const isNotLatinSpeciesName = await isNotScientificName(title);
+        if (isNotLatinSpeciesName) {
+          matchedTitle = title;
+          break;
+        }
+      }
+
+      return matchedTitle;
     })
     .catch(() => null)
 }
