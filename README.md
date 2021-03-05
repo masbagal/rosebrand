@@ -1,7 +1,5 @@
 # Twitter Rosebrand Jingle Bot
 
-> Warning: It's a messy and duct tape code as this is only a random side project to kill some time.
-
 https://twitter.com/rosebrand_bot
 
 This contains the code of the Rosebrand Jingle Bot.
